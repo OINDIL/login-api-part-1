@@ -24,6 +24,8 @@ export async function LoginMiddleware(req, res, next) {
 
         const decodedUser = jwt.verify(token, process.env.SECRET);
 
+        req.user = decodedUser;
+
         if (!decodedUser) {
             return res.status(404).json({
                 success: false,

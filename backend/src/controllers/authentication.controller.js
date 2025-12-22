@@ -4,6 +4,7 @@ import crypto from "node:crypto";
 import { db } from "../utils/db.js";
 
 import dotenv from 'dotenv'
+import { ObjectId } from "mongodb";
 
 dotenv.config();
 
@@ -203,4 +204,40 @@ export async function SignIn(req, res) {
 
 export async function checkAuth(req, res) {
     res.json({ success: true, message: "User Authenticated" })
+}
+
+export async function getProfile(req, res) {
+    try {
+
+        const user = req.user;
+
+        console.log(user)
+
+        const userData = await db.collection("users").findOne({ _id: new ObjectId(user.id) })
+
+
+        if (!userData) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found",
+            })
+        }
+
+        const protectedUserData = {
+            name: userData.name,
+            email: userData.email,
+            phoneNo: userData.phone
+        }
+
+        res.json({
+            success: true,
+            message: "User data",
+            user: protectedUserData
+        })
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Internal Server Error"
+        })
+    }
 }
