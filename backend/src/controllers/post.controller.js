@@ -51,14 +51,20 @@ export async function CreatePost(req, res) {
 export async function GetPost(req, res) {
     try {
 
-        const { user } = req
-        const allUserPosts = await db.collection("posts").find({ userId: user.id }).toArray();
+        const allPosts = await db.collection("posts").find().toArray()
+
+        const allPostsWithAuthor = await Promise.all(allPosts.map(async (data) => {
+            const postAuthors = await db.collection("users").findOne({ _id: new ObjectId(data.userId) })
+
+            return {
+                userName: postAuthors.name,
+                content: data.content
+            }
+        }))
 
         res.json({
             success: true,
-            posts: allUserPosts.map((data) => {
-                return { content: data.content }
-            })
+            posts: allPostsWithAuthor
         })
 
     } catch (error) {
