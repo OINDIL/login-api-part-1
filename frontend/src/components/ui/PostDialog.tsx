@@ -15,15 +15,16 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 
-interface UserData {
+interface Props {
     user: {
         name: string,
         phoneNo: string,
         email: string
-    }
+    },
+    onPostSuccess: () => void
 }
 
-function PostDialog({ user }: UserData) {
+function PostDialog({ user, onPostSuccess }: Props) {
 
     const [post, setPost] = useState<string | null>(null);
 
@@ -55,6 +56,7 @@ function PostDialog({ user }: UserData) {
             }
 
             toast.success(data.message);
+            onPostSuccess();
 
         } catch (err) {
             console.log(err)
