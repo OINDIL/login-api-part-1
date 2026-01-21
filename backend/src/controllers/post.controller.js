@@ -23,7 +23,8 @@ export async function CreatePost(req, res) {
 
         const newPost = await db.collection("posts").insertOne({
             content,
-            userId: req.user.id
+            userId: req.user.id,
+            createdAt: new Date().toLocaleString()
         })
 
         if (!newPost) {
@@ -50,7 +51,7 @@ export async function CreatePost(req, res) {
 // Get Posts
 export async function GetPost(req, res) {
     try {
-
+        console.log("Hit")
         const allPosts = await db.collection("posts").find().toArray()
 
         const allPostsWithAuthor = await Promise.all(allPosts.map(async (data) => {
@@ -58,13 +59,14 @@ export async function GetPost(req, res) {
 
             return {
                 userName: postAuthors.name,
-                content: data.content
+                content: data.content,
+                dateTime: data.createdAt,
             }
         }))
 
         res.json({
             success: true,
-            posts: allPostsWithAuthor
+            posts: allPostsWithAuthor.reverse()
         })
 
     } catch (error) {
