@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import AuthenticationRouter from "./routes/authentication.route.js"
 import { profileRouter } from "./routes/profile.route.js";
 import postRouter from "./routes/post.route.js"
+import UploadFile from "./routes/upload.route.js"
 
 dotenv.config()
 
@@ -29,6 +30,7 @@ app.get("/test", (req, res) => {
 app.use("/api", AuthenticationRouter);
 app.use("/", profileRouter);
 app.use("/api/posts", postRouter);
+app.use('/api/image', UploadFile)
 
 
 
