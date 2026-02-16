@@ -3,7 +3,14 @@ import { cloudinary } from "../utils/cloudinary.js";
 export async function UploadImage(req, res) {
     try {
 
-        const { file } = req.body;
+        const { file } = req;
+
+
+
+
+        console.log(req)
+
+
 
         if (!file) {
             return res.status(404).json({
@@ -12,7 +19,7 @@ export async function UploadImage(req, res) {
             })
         }
 
-        const uploadedImg = await cloudinary.uploader.upload(file);
+        const uploadedImg = await cloudinary.uploader.upload(file.path);
 
 
         if (!uploadedImg.url) {

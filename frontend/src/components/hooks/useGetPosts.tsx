@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 interface PostType {
     userName: string,
     content: string,
+    imageUrl?: string,
     dateTime: string,
 }
 

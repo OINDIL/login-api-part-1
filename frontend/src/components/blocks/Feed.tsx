@@ -43,8 +43,9 @@ export default function Feed() {
                                 <CardTitle className="capitalize">{data.userName}</CardTitle>
                                 <CardDescription>{data.dateTime}</CardDescription>
                             </CardHeader>
-                            <CardContent>
+                            <CardContent className="space-y-3">
                                 <p className="text-base text-neutral-300">{data.content}</p>
+                                <img src={data?.imageUrl} alt="user-post" className="rounded-xl size-full" />
                             </CardContent>
 
                             <CardFooter className="space-x-4 *:size-4 *:hover:cursor-pointer *:hover:scale-[115%]">

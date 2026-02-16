@@ -4,7 +4,7 @@ import { db } from "../utils/db.js"
 export async function CreatePost(req, res) {
     try {
 
-        const { content } = req.body;
+        const { content, imageUrl } = req.body;
 
         if (!content) {
             return res.status(404).json({
@@ -23,6 +23,7 @@ export async function CreatePost(req, res) {
 
         const newPost = await db.collection("posts").insertOne({
             content,
+            imageUrl,
             userId: req.user.id,
             createdAt: new Date().toLocaleString()
         })
@@ -60,6 +61,7 @@ export async function GetPost(req, res) {
             return {
                 userName: postAuthors.name,
                 content: data.content,
+                imageUrl: data.imageUrl,
                 dateTime: data.createdAt,
             }
         }))

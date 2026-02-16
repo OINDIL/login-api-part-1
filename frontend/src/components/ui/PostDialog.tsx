@@ -32,6 +32,7 @@ function PostDialog({ user, onPostSuccess }: Props) {
 
     const [post, setPost] = useState<string | null>(null);
     const [previewImage, setPreviewImage] = useState('');
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
     function selectFile() {
         if (!fileSelectionRef.current) return;
@@ -44,7 +45,7 @@ function PostDialog({ user, onPostSuccess }: Props) {
         const file = e.target.files[0];
 
 
-        console.log(file)
+        setSelectedFile(file);
 
         const reader = new FileReader();
 
@@ -57,11 +58,50 @@ function PostDialog({ user, onPostSuccess }: Props) {
 
     }
 
-    console.log(previewImage)
+    async function handleFileUpload() {
+        try {
+            if (!selectedFile) {
+                return toast.error("No file selected");
+            }
+
+            const token = localStorage.getItem("token");
+
+            const formData = new FormData();
+
+            formData.append('file', selectedFile);
+
+
+            const res = await fetch('http://localhost:3000/api/image/upload', {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                },
+                body: formData
+            })
+
+            if (!res.ok) {
+                return null;
+            }
+
+            const imageData = await res.json();
+
+            console.log(res);
+
+            return imageData.url
+        } catch (error) {
+            console.log(error);
+        }
+    }
 
     async function CreatePost() {
         try {
             const token = localStorage.getItem("token");
+
+            const imageUrl = await handleFileUpload();
+
+            if (!imageUrl) return toast.error("Image not uploaded");
+
+
 
             const res = await fetch("http://localhost:3000/api/posts/create",
                 {
@@ -71,7 +111,8 @@ function PostDialog({ user, onPostSuccess }: Props) {
                         "Authorization": `Bearer ${token}`
                     },
                     body: JSON.stringify({
-                        content: post
+                        content: post,
+                        imageUrl: imageUrl
                     })
                 })
 
