@@ -52,7 +52,6 @@ export async function CreatePost(req, res) {
 // Get Posts
 export async function GetPost(req, res) {
     try {
-        console.log("Hit")
         const allPosts = await db.collection("posts").find().toArray()
 
         const allPostsWithAuthor = await Promise.all(allPosts.map(async (data) => {
@@ -60,8 +59,10 @@ export async function GetPost(req, res) {
 
             return {
                 userName: postAuthors.name,
+                id: data._id,
                 content: data.content,
                 imageUrl: data.imageUrl,
+                likeCount: data.likeCount,
                 dateTime: data.createdAt,
             }
         }))
@@ -80,3 +81,67 @@ export async function GetPost(req, res) {
     }
 }
 
+
+
+export async function UpdateLikeCount(req, res) {
+    try {
+        const { postId } = req.body;
+        const { id } = req.user;
+
+
+
+
+        if (!postId) {
+            return res.status(404).json({
+                success: false,
+                message: "Post not found"
+            })
+        }
+
+
+        const userAlreadyLiked = await db.collection('posts').findOne({
+            _id: new ObjectId(postId),
+            likedBy: id
+        })
+
+
+        if (userAlreadyLiked) {
+            return res.status(404).json({
+                success: false,
+                message: "You have already liked this post"
+            })
+        }
+
+        const postData = await db.collection("posts").findOneAndUpdate({
+            _id: new ObjectId(postId)
+        }, {
+            $inc: {
+                "likeCount": 1
+            },
+            $push: {
+                "likedBy": id
+            }
+        })
+
+
+        if (!postData) {
+            return res.status(404).json({
+                success: false,
+                message: "Post not found"
+            })
+        }
+
+        res.json({
+            success: true,
+            message: "Liked post"
+        })
+
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({
+            success: false,
+            message: "Internal Server Error"
+        })
+    }
+}
